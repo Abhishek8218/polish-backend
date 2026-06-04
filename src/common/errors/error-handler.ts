@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { Prisma } from "../../../prisma/generated/prisma/client";
+import { Prisma } from '@/generated/prisma';
 
 import { ApiError } from './api-errors';
 import { ZodError } from 'zod';
