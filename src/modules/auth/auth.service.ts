@@ -58,7 +58,7 @@ export const loginUser = async (
    }
    const isPasswordValid = await bcrypt.compare(payload.password,user.password)
    if(!isPasswordValid){
-       throw new ApiError(401,'Invalid credentials');
+       throw new ApiError(403,'Invalid credentials');
    }
 
    const jwtPayload = {
