@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserPlan {
+  FREE
+  MONTHLY
+  YEARLY
+  PROMO
+}
+
+enum ToneType {
+  NEUTRAL
+  PROFESSIONAL
+  CASUAL
+  FRIENDLY
+  FORMAL
+  CONVERSATIONAL
+  ASSERTIVE
+  EMPATHETIC
+}
+
+enum LengthPreference {
+  ORIGINAL
+  SHORTER
+  LONGER
+  CONCISE
+  ADD_MORE
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String
+  fullName          String?
+  role              UserRole @default(USER)
+  avatarUrl         String?
+
+  plan              UserPlan @default(FREE)
+
+  creditsRemaining  Int      @default(10)
+
+  creditsResetDate  DateTime?
+
+  isEmailVerified   Boolean  @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  frameworks        Framework[]
+  polishHistory     PolishHistory[]
+}
+
+model Framework {
+  id                  String             @id @default(uuid())
+
+  userId              String
+
+  name                String
+  prompt              String             @db.Text
+
+  tone                ToneType
+
+  formalityLevel      Int
+  creativityLevel     Int
+
+  lengthPreference    LengthPreference
+
+  preserveStyle       Boolean            @default(true)
+  enhanceClarity      Boolean            @default(true)
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  polishHistory       PolishHistory[]
+
+  @@index([userId])
+}
+
+model PolishHistory {
+  id              String      @id @default(uuid())
+
+  userId          String
+  frameworkId     String?
+
+  originalText    String      @db.Text
+  polishedText    String      @db.Text
+
+  creditsUsed     Int         @default(1)
+
+  createdAt       DateTime    @default(now())
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  framework       Framework?  @relation(fields: [frameworkId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([frameworkId])
+}
