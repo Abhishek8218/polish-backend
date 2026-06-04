@@ -5,7 +5,7 @@ import cors from '@fastify/cors';
 
 export const registerCors = async (app: FastifyInstance) => {
   await app.register(cors, {
-    origin: ['https://polishai.vercel.app'],
+    origin: ['https://polishai.vercel.app',"http://localhost:5173"],
     
     credentials: true,                    // Important for cookies/auth
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
