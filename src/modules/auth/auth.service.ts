@@ -6,8 +6,7 @@ import { RegisterInput, TLoginInput } from "./auth.schema"
 import { generateAccessToken, generateRefreshToken } from '../../common/utils/jwt';
 import { redis } from '../../config/redis';
 import { REDIS_KEYS } from '../../common/constants/redis-keys';
-import { env } from 'node:process';
-
+import { env } from '../../config/env';
 
 
 type JwtPayload = {
@@ -95,11 +94,22 @@ export const loginUser = async (
 
 export const refreshAccessToken = async (refreshToken: string) => {
 try {
-    const decoded = jwt.verify(
-        refreshToken,
-        env.JWT_REFRESH_SECRET
-    ) as JwtPayload;
+  const decoded = jwt.verify(
+    refreshToken,
+    env.JWT_REFRESH_SECRET,
+  );
 
+  if (
+    typeof decoded !== "object" ||
+    !decoded ||
+    !("userId" in decoded) ||
+    !("email" in decoded)
+  ) {
+    throw new ApiError(
+      401,
+      "Invalid token payload",
+    );
+  }
 
     const storedToken =  await redis.get(
         REDIS_KEYS.refreshToken(decoded.userId)

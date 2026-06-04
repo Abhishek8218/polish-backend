@@ -11,12 +11,18 @@ const start = async () => {
 
     app.log.info('Database connected');
 
+    const port =
+      Number(process.env.PORT) ||
+      env.PORT;
+
     await app.listen({
-      port: env.PORT,
+      port,
       host: '0.0.0.0',
     });
 
-    app.log.info(`Server running on port ${env.PORT}`);
+    app.log.info(
+      `Server running on port ${port}`
+    );
   } catch (error) {
     console.error(error);
 

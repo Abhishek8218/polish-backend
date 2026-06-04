@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ApiError } from "../common/errors/api-errors";
 import * as jwt from "jsonwebtoken";
-import { env } from "node:process";
+import { env } from "../config/env";
 
 type JwtPayload = {
   userId: string;
@@ -23,13 +23,32 @@ export const authMiddleware = async (
     throw new ApiError(401, "Unauthorized access");
   }
 
-  try {
-    request.log.info(authHeader);
-    request.log.info(token);
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
-    request.log.info(decoded);
-    request.user = decoded;
-  } catch {
-    throw new ApiError(401, "Invalid or expired token");
+ try {
+  const decoded = jwt.verify(
+    token,
+    env.JWT_ACCESS_SECRET,
+  );
+
+  if (
+    typeof decoded !== "object" ||
+    !decoded ||
+    !("userId" in decoded) ||
+    !("email" in decoded)
+  ) {
+    throw new ApiError(
+      401,
+      "Invalid token payload",
+    );
   }
+
+  request.user = {
+    userId: decoded.userId as string,
+    email: decoded.email as string,
+  };
+} catch {
+  throw new ApiError(
+    401,
+    "Invalid or expired token",
+  );
+}
 };
