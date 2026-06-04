@@ -1,4 +1,4 @@
-import { Framework } from '@prisma/client';
+import { Framework } from "../../../generated/prisma/client";
 
 export const buildFrameworkInstructions = (
   framework: Framework
